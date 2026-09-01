@@ -1,5 +1,10 @@
 using Event_Parking_Reservation_System.Data;
 using Microsoft.EntityFrameworkCore;
+<<<<<<< HEAD
+=======
+using Event_Parking_Reservation_System.Interfaces;
+using Event_Parking_Reservation_System.Services;
+>>>>>>> 03a8f1c (Complete booking module with expiry and seat validation)
 
 
 
@@ -17,6 +22,16 @@ namespace Event_Parking_Reservation_System
     )
 );
 
+<<<<<<< HEAD
+=======
+            // Service registration for dependency injection
+
+            builder.Services.AddScoped<IBookingService, BookingService>();
+
+            builder.Services.AddHostedService<BookingExpirationService>();
+
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
+>>>>>>> 03a8f1c (Complete booking module with expiry and seat validation)
 
 
             // Add services to the container.

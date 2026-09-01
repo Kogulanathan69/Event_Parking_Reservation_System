@@ -19,6 +19,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+<<<<<<< HEAD
   <ItemGroup>
     <Folder Include="Controllers\" />
     <Folder Include="Interfaces\" />
@@ -27,4 +28,6 @@
     <Folder Include="Services\" />
   </ItemGroup>
 
+=======
+>>>>>>> 03a8f1c (Complete booking module with expiry and seat validation)
 </Project>
