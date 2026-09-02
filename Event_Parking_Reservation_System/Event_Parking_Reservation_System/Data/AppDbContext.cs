@@ -1,11 +1,5 @@
-﻿
-
-using Event_Parking_Reservation_System.Models;
-//03a8f1c (Complete booking module with expiry and seat validation)
+﻿using Event_Parking_Reservation_System.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Data;
 
 namespace Event_Parking_Reservation_System.Data
 {
@@ -16,15 +10,12 @@ namespace Event_Parking_Reservation_System.Data
         {
         }
 
-      // HEAD
-        
-
-
         public DbSet<Booking> Bookings { get; set; }
+
 
         public DbSet<BookingSeat> BookingSeats { get; set; }
 
+
         public DbSet<Payment> Payments { get; set; }
-        03a8f1c (Complete booking module with expiry and seat validation)
     }
 }
