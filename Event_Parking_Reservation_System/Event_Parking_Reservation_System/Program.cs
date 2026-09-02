@@ -18,9 +18,15 @@ namespace Event_Parking_Reservation_System
             );
 
             // Dependency Injection
-            builder.Services.AddScoped<IBookingService, BookingService>();
-            builder.Services.AddHostedService<BookingExpirationService>();
-            builder.Services.AddScoped<IPaymentService, PaymentService>();
+           // Dependency Injection
+builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddHostedService<BookingExpirationService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+
+builder.Services.AddScoped<IVenueService, VenueService>();
+builder.Services.AddScoped<IEventCategoryService, EventCategoryService>();
+builder.Services.AddScoped<IEventService, EventService>();
+
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
