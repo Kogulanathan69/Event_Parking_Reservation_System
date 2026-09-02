@@ -1,7 +1,7 @@
 using Event_Parking_Reservation_System.Data;
+using Event_Parking_Reservation_System.Interfaces;
+using Event_Parking_Reservation_System.Services;
 using Microsoft.EntityFrameworkCore;
-
-
 
 namespace Event_Parking_Reservation_System
 {
@@ -13,22 +13,21 @@ namespace Event_Parking_Reservation_System
 
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(
-                builder.Configuration.GetConnectionString("DefaultConnection")
-    )
-);
+                    builder.Configuration.GetConnectionString("DefaultConnection")
+                )
+            );
 
-
-
-            // Add services to the container.
+            // Dependency Injection
+            builder.Services.AddScoped<IBookingService, BookingService>();
+            builder.Services.AddHostedService<BookingExpirationService>();
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -38,7 +37,6 @@ namespace Event_Parking_Reservation_System
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

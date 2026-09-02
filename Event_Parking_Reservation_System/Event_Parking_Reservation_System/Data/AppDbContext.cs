@@ -1,8 +1,5 @@
-﻿
+﻿using Event_Parking_Reservation_System.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Data;
 
 namespace Event_Parking_Reservation_System.Data
 {
@@ -13,6 +10,12 @@ namespace Event_Parking_Reservation_System.Data
         {
         }
 
-        
+        public DbSet<Booking> Bookings { get; set; }
+
+
+        public DbSet<BookingSeat> BookingSeats { get; set; }
+
+
+        public DbSet<Payment> Payments { get; set; }
     }
 }
