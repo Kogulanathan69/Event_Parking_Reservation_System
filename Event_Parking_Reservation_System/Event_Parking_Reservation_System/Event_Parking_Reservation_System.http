@@ -1,6 +1,156 @@
-@Event_Parking_Reservation_System_HostAddress = http://localhost:5202
+@Event_Parking_Reservation_System_HostAddress = https://localhost:7129
 
-GET {{Event_Parking_Reservation_System_HostAddress}}/weatherforecast/
+
+### =========================
+### BOOKING
+### =========================
+
+### Get all bookings
+GET {{Event_Parking_Reservation_System_HostAddress}}/api/Booking
 Accept: application/json
 
+
 ###
+
+### Get booking by id
+GET {{Event_Parking_Reservation_System_HostAddress}}/api/Booking/1
+Accept: application/json
+
+
+###
+
+### Get bookings by user id
+GET {{Event_Parking_Reservation_System_HostAddress}}/api/Booking/user/1
+Accept: application/json
+
+
+###
+
+### Create booking
+POST {{Event_Parking_Reservation_System_HostAddress}}/api/Booking
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "eventId": 1,
+  "seatIds": [
+    1,
+    2
+  ],
+  "totalAmount": 2500
+}
+
+
+###
+
+### Confirm booking
+PUT {{Event_Parking_Reservation_System_HostAddress}}/api/Booking/1/confirm
+Accept: application/json
+
+
+###
+
+### Cancel booking
+PUT {{Event_Parking_Reservation_System_HostAddress}}/api/Booking/1/cancel
+Accept: application/json
+
+
+###
+
+### Expire pending bookings
+PUT {{Event_Parking_Reservation_System_HostAddress}}/api/Booking/expire-pending
+Accept: application/json
+
+
+
+### =========================
+### PRIVATE EVENT BOOKING
+### =========================
+
+### Get all private event bookings
+GET {{Event_Parking_Reservation_System_HostAddress}}/api/PrivateEventBooking
+Accept: application/json
+
+
+###
+
+### Get private event booking by id
+GET {{Event_Parking_Reservation_System_HostAddress}}/api/PrivateEventBooking/1
+Accept: application/json
+
+
+###
+
+### Get private event bookings by user id
+GET {{Event_Parking_Reservation_System_HostAddress}}/api/PrivateEventBooking/user/1
+Accept: application/json
+
+
+###
+
+### Create private event booking
+POST {{Event_Parking_Reservation_System_HostAddress}}/api/PrivateEventBooking
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "eventType": "Wedding",
+  "eventName": "Wedding Event",
+  "venueId": 1,
+  "eventDate": "2026-09-20T10:00:00",
+  "guestCount": 250,
+  "needParking": true,
+  "parkingAreaId": 1,
+  "totalAmount": 50000
+}
+
+
+###
+
+### Confirm private event booking
+PUT {{Event_Parking_Reservation_System_HostAddress}}/api/PrivateEventBooking/1/confirm
+Accept: application/json
+
+
+###
+
+### Cancel private event booking
+PUT {{Event_Parking_Reservation_System_HostAddress}}/api/PrivateEventBooking/1/cancel
+Accept: application/json
+
+
+
+### =========================
+### PAYMENT
+### =========================
+
+### Get all payments
+GET {{Event_Parking_Reservation_System_HostAddress}}/api/Payment
+Accept: application/json
+
+
+###
+
+### Get payment by id
+GET {{Event_Parking_Reservation_System_HostAddress}}/api/Payment/1
+Accept: application/json
+
+
+###
+
+### Get payment by booking id
+GET {{Event_Parking_Reservation_System_HostAddress}}/api/Payment/booking/1
+Accept: application/json
+
+
+###
+
+### Create payment
+POST {{Event_Parking_Reservation_System_HostAddress}}/api/Payment
+Content-Type: application/json
+
+{
+  "bookingId": 1,
+  "amount": 2500,
+  "paymentMethod": "Card"
+}

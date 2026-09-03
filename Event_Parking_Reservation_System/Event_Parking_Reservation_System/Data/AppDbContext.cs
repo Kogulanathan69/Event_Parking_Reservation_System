@@ -17,5 +17,7 @@ namespace Event_Parking_Reservation_System.Data
 
 
         public DbSet<Payment> Payments { get; set; }
+
+        public DbSet<PrivateEventBooking> PrivateEventBookings { get; set; }
     }
 }

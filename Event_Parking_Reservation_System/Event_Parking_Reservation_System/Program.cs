@@ -22,6 +22,26 @@ namespace Event_Parking_Reservation_System
             builder.Services.AddHostedService<BookingExpirationService>();
             builder.Services.AddScoped<IPaymentService, PaymentService>();
 
+
+            builder.Services.AddScoped<
+                IPrivateEventBookingService,
+                PrivateEventBookingService
+            >();
+
+
+            // CORS - Allow Angular frontend
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAngular",
+                    policy =>
+                    {
+                        policy
+                            .WithOrigins("http://localhost:4200")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });
+            });
+
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -33,6 +53,11 @@ namespace Event_Parking_Reservation_System
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+
+            
+            // IMPORTANT: CORS middleware
+            app.UseCors("AllowAngular");
 
             app.UseHttpsRedirection();
 
