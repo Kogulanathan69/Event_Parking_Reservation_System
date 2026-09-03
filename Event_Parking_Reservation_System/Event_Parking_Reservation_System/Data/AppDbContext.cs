@@ -1,8 +1,7 @@
 ﻿
+using Event_Parking_Reservation_System.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Data;
+
 
 namespace Event_Parking_Reservation_System.Data
 {
@@ -11,8 +10,11 @@ namespace Event_Parking_Reservation_System.Data
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
         {
+
         }
 
+        public DbSet<User> Users { get; set; }
         
+        public DbSet<Role> Roles { get; set; }
     }
 }
