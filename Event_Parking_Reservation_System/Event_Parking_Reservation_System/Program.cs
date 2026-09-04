@@ -1,7 +1,12 @@
 using Event_Parking_Reservation_System.Data;
 using Event_Parking_Reservation_System.Interfaces;
 using Event_Parking_Reservation_System.Services;
+
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+
+using System.Text;
 
 namespace Event_Parking_Reservation_System
 {
@@ -17,29 +22,60 @@ namespace Event_Parking_Reservation_System
                 )
             );
 
-            // Dependency Injection
+            builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IBookingService, BookingService>();
             builder.Services.AddHostedService<BookingExpirationService>();
             builder.Services.AddScoped<IPaymentService, PaymentService>();
-
-
             builder.Services.AddScoped<
                 IPrivateEventBookingService,
                 PrivateEventBookingService
             >();
 
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme =
+                    JwtBearerDefaults.AuthenticationScheme;
 
-            // CORS - Allow Angular frontend
+                options.DefaultChallengeScheme =
+                    JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                var key = builder.Configuration["Jwt:Key"];
+
+                options.TokenValidationParameters =
+                    new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+
+                        ValidIssuer =
+                            builder.Configuration["Jwt:Issuer"],
+
+                        ValidAudience =
+                            builder.Configuration["Jwt:Audience"],
+
+                        IssuerSigningKey =
+                            new SymmetricSecurityKey(
+                                Encoding.UTF8.GetBytes(key!)
+                            )
+                    };
+            });
+
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAngular",
+                options.AddPolicy(
+                    "AllowAngular",
                     policy =>
                     {
                         policy
                             .WithOrigins("http://localhost:4200")
                             .AllowAnyHeader()
                             .AllowAnyMethod();
-                    });
+                    }
+                );
             });
 
             builder.Services.AddControllers();
@@ -54,12 +90,11 @@ namespace Event_Parking_Reservation_System
                 app.UseSwaggerUI();
             }
 
+            app.UseHttpsRedirection();
 
-            
-            // IMPORTANT: CORS middleware
             app.UseCors("AllowAngular");
 
-            app.UseHttpsRedirection();
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

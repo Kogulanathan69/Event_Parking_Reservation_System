@@ -4,7 +4,6 @@ using Event_Parking_Reservation_System.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
@@ -16,25 +15,38 @@ namespace Event_Parking_Reservation_System.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
+
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Event_Parking_Reservation_System.Models.Booking", b =>
+
+            // =========================
+            // BOOKING
+            // =========================
+
+            modelBuilder.Entity(
+                "Event_Parking_Reservation_System.Models.Booking",
+                b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(
+                        b.Property<int>("Id")
+                    );
 
-                    b.Property<DateTime>("BookingDate")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.Property<int>("EventId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("BookingDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("datetime2");
@@ -46,21 +58,27 @@ namespace Event_Parking_Reservation_System.Migrations
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.ToTable("Bookings");
                 });
 
-            modelBuilder.Entity("Event_Parking_Reservation_System.Models.BookingSeat", b =>
+
+            // =========================
+            // BOOKING SEAT
+            // =========================
+
+            modelBuilder.Entity(
+                "Event_Parking_Reservation_System.Models.BookingSeat",
+                b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(
+                        b.Property<int>("Id")
+                    );
 
                     b.Property<int>("BookingId")
                         .HasColumnType("int");
@@ -75,22 +93,28 @@ namespace Event_Parking_Reservation_System.Migrations
                     b.ToTable("BookingSeats");
                 });
 
-            modelBuilder.Entity("Event_Parking_Reservation_System.Models.Payment", b =>
+
+            // =========================
+            // PAYMENT
+            // =========================
+
+            modelBuilder.Entity(
+                "Event_Parking_Reservation_System.Models.Payment",
+                b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(
+                        b.Property<int>("Id")
+                    );
 
                     b.Property<int>("BookingId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("datetime2");
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
@@ -99,6 +123,9 @@ namespace Event_Parking_Reservation_System.Migrations
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("TransactionReference")
                         .IsRequired()
@@ -111,24 +138,39 @@ namespace Event_Parking_Reservation_System.Migrations
                     b.ToTable("Payments");
                 });
 
-            modelBuilder.Entity("Event_Parking_Reservation_System.Models.PrivateEventBooking", b =>
+
+            // =========================
+            // PRIVATE EVENT BOOKING
+            // =========================
+
+            modelBuilder.Entity(
+                "Event_Parking_Reservation_System.Models.PrivateEventBooking",
+                b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(
+                        b.Property<int>("Id")
+                    );
 
-                    b.Property<DateTime>("EventDate")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EventName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("EventType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("VenueId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EventDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("GuestCount")
                         .HasColumnType("int");
@@ -139,27 +181,108 @@ namespace Event_Parking_Reservation_System.Migrations
                     b.Property<int?>("ParkingAreaId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("VenueId")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("PrivateEventBookings");
                 });
 
-            modelBuilder.Entity("Event_Parking_Reservation_System.Models.BookingSeat", b =>
+
+            // =========================
+            // ROLE
+            // =========================
+
+            modelBuilder.Entity(
+                "Event_Parking_Reservation_System.Models.Role",
+                b =>
                 {
-                    b.HasOne("Event_Parking_Reservation_System.Models.Booking", "Booking")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(
+                        b.Property<int>("Id")
+                    );
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
+                });
+
+
+            // =========================
+            // USER
+            // =========================
+
+            modelBuilder.Entity(
+                "Event_Parking_Reservation_System.Models.User",
+                b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(
+                        b.Property<int>("Id")
+                    );
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("Users");
+                });
+
+
+            // =========================
+            // RELATIONSHIPS
+            // =========================
+
+            modelBuilder.Entity(
+                "Event_Parking_Reservation_System.Models.BookingSeat",
+                b =>
+                {
+                    b.HasOne(
+                            "Event_Parking_Reservation_System.Models.Booking",
+                            "Booking"
+                        )
                         .WithMany("BookingSeats")
                         .HasForeignKey("BookingId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -168,9 +291,15 @@ namespace Event_Parking_Reservation_System.Migrations
                     b.Navigation("Booking");
                 });
 
-            modelBuilder.Entity("Event_Parking_Reservation_System.Models.Payment", b =>
+
+            modelBuilder.Entity(
+                "Event_Parking_Reservation_System.Models.Payment",
+                b =>
                 {
-                    b.HasOne("Event_Parking_Reservation_System.Models.Booking", "Booking")
+                    b.HasOne(
+                            "Event_Parking_Reservation_System.Models.Booking",
+                            "Booking"
+                        )
                         .WithMany()
                         .HasForeignKey("BookingId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -179,10 +308,31 @@ namespace Event_Parking_Reservation_System.Migrations
                     b.Navigation("Booking");
                 });
 
-            modelBuilder.Entity("Event_Parking_Reservation_System.Models.Booking", b =>
+
+            modelBuilder.Entity(
+                "Event_Parking_Reservation_System.Models.User",
+                b =>
+                {
+                    b.HasOne(
+                            "Event_Parking_Reservation_System.Models.Role",
+                            "Role"
+                        )
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+                });
+
+
+            modelBuilder.Entity(
+                "Event_Parking_Reservation_System.Models.Booking",
+                b =>
                 {
                     b.Navigation("BookingSeats");
                 });
+
 #pragma warning restore 612, 618
         }
     }
