@@ -1,12 +1,12 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-
 using Event_Parking_Reservation_System.Data;
 using Event_Parking_Reservation_System.Interfaces;
 using Event_Parking_Reservation_System.Services;
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+
+using System.Text;
 
 namespace Event_Parking_Reservation_System
 {
@@ -16,17 +16,22 @@ namespace Event_Parking_Reservation_System
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Database
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection")
                 )
             );
 
-            // AuthService Dependency Injection
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddScoped<IBookingService, BookingService>();
+            builder.Services.AddHostedService<BookingExpirationService>();
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
+            builder.Services.AddScoped<
+                IPrivateEventBookingService,
+                PrivateEventBookingService
+            >();
 
-            // JWT Authentication
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme =
@@ -60,12 +65,49 @@ namespace Event_Parking_Reservation_System
                     };
             });
 
-            // Controllers
-            builder.Services.AddControllers();
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(
+                    "AllowAngular",
+                    policy =>
+                    {
+                        policy
+                            .WithOrigins("http://localhost:4200")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    }
+                );
+            });
 
-            // Swagger
+            builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+                    Description = "Enter JWT token"
+                });
+
+                options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+            });
 
             var app = builder.Build();
 
@@ -77,7 +119,8 @@ namespace Event_Parking_Reservation_System
 
             app.UseHttpsRedirection();
 
-            // Important
+            app.UseCors("AllowAngular");
+
             app.UseAuthentication();
 
             app.UseAuthorization();

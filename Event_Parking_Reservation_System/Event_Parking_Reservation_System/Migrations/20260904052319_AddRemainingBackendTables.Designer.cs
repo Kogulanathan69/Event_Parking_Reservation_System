@@ -4,6 +4,7 @@ using Event_Parking_Reservation_System.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Event_Parking_Reservation_System.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260904052319_AddRemainingBackendTables")]
+    partial class AddRemainingBackendTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -94,10 +97,6 @@ namespace Event_Parking_Reservation_System.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("OtpCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Purpose")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -228,9 +227,6 @@ namespace Event_Parking_Reservation_System.Migrations
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
-
-                    b.Property<bool>("IsEmailVerified")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()

@@ -25,7 +25,7 @@ namespace Event_Parking_Reservation_System.Models
         public Role? Role { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-
+        
+        public bool IsEmailVerified { get; set; } = false;
     }
 }
