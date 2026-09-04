@@ -22,11 +22,7 @@ namespace Event_Parking_Reservation_System.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-
-            // =========================
             // BOOKING
-            // =========================
-
             modelBuilder.Entity(
                 "Event_Parking_Reservation_System.Models.Booking",
                 b =>
@@ -35,9 +31,8 @@ namespace Event_Parking_Reservation_System.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(
-                        b.Property<int>("Id")
-                    );
+                    SqlServerPropertyBuilderExtensions
+                        .UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -56,6 +51,7 @@ namespace Event_Parking_Reservation_System.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
@@ -63,11 +59,7 @@ namespace Event_Parking_Reservation_System.Migrations
                     b.ToTable("Bookings");
                 });
 
-
-            // =========================
             // BOOKING SEAT
-            // =========================
-
             modelBuilder.Entity(
                 "Event_Parking_Reservation_System.Models.BookingSeat",
                 b =>
@@ -76,9 +68,8 @@ namespace Event_Parking_Reservation_System.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(
-                        b.Property<int>("Id")
-                    );
+                    SqlServerPropertyBuilderExtensions
+                        .UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("BookingId")
                         .HasColumnType("int");
@@ -90,14 +81,85 @@ namespace Event_Parking_Reservation_System.Migrations
 
                     b.HasIndex("BookingId");
 
+                    b.HasIndex("SeatId");
+
                     b.ToTable("BookingSeats");
                 });
 
+            // EVENT
+            modelBuilder.Entity(
+                "Event_Parking_Reservation_System.Models.Event",
+                b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-            // =========================
+                    SqlServerPropertyBuilderExtensions
+                        .UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Capacity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EndDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("ParkingFee")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("StartDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("TicketPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("VenueId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("VenueId");
+
+                    b.ToTable("Events");
+                });
+
+            // EVENT CATEGORY
+            modelBuilder.Entity(
+                "Event_Parking_Reservation_System.Models.EventCategory",
+                b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions
+                        .UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EventCategories");
+                });
+
             // PAYMENT
-            // =========================
-
             modelBuilder.Entity(
                 "Event_Parking_Reservation_System.Models.Payment",
                 b =>
@@ -106,15 +168,18 @@ namespace Event_Parking_Reservation_System.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(
-                        b.Property<int>("Id")
-                    );
+                    SqlServerPropertyBuilderExtensions
+                        .UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("BookingId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
@@ -123,9 +188,6 @@ namespace Event_Parking_Reservation_System.Migrations
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("TransactionReference")
                         .IsRequired()
@@ -138,11 +200,7 @@ namespace Event_Parking_Reservation_System.Migrations
                     b.ToTable("Payments");
                 });
 
-
-            // =========================
             // PRIVATE EVENT BOOKING
-            // =========================
-
             modelBuilder.Entity(
                 "Event_Parking_Reservation_System.Models.PrivateEventBooking",
                 b =>
@@ -151,9 +209,8 @@ namespace Event_Parking_Reservation_System.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(
-                        b.Property<int>("Id")
-                    );
+                    SqlServerPropertyBuilderExtensions
+                        .UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -182,6 +239,7 @@ namespace Event_Parking_Reservation_System.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Status")
@@ -193,11 +251,7 @@ namespace Event_Parking_Reservation_System.Migrations
                     b.ToTable("PrivateEventBookings");
                 });
 
-
-            // =========================
             // ROLE
-            // =========================
-
             modelBuilder.Entity(
                 "Event_Parking_Reservation_System.Models.Role",
                 b =>
@@ -206,9 +260,8 @@ namespace Event_Parking_Reservation_System.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(
-                        b.Property<int>("Id")
-                    );
+                    SqlServerPropertyBuilderExtensions
+                        .UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -219,11 +272,45 @@ namespace Event_Parking_Reservation_System.Migrations
                     b.ToTable("Roles");
                 });
 
+            // SEAT
+            modelBuilder.Entity(
+                "Event_Parking_Reservation_System.Models.Seat",
+                b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-            // =========================
+                    SqlServerPropertyBuilderExtensions
+                        .UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Row")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SeatType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId", "Row", "Number")
+                        .IsUnique();
+
+                    b.ToTable("Seats");
+                });
+
             // USER
-            // =========================
-
             modelBuilder.Entity(
                 "Event_Parking_Reservation_System.Models.User",
                 b =>
@@ -232,9 +319,8 @@ namespace Event_Parking_Reservation_System.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(
-                        b.Property<int>("Id")
-                    );
+                    SqlServerPropertyBuilderExtensions
+                        .UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -270,36 +356,94 @@ namespace Event_Parking_Reservation_System.Migrations
                     b.ToTable("Users");
                 });
 
+            // VENUE
+            modelBuilder.Entity(
+                "Event_Parking_Reservation_System.Models.Venue",
+                b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-            // =========================
-            // RELATIONSHIPS
-            // =========================
+                    SqlServerPropertyBuilderExtensions
+                        .UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Capacity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Venues");
+                });
+
+            // BOOKING SEAT RELATIONSHIPS
             modelBuilder.Entity(
                 "Event_Parking_Reservation_System.Models.BookingSeat",
                 b =>
                 {
                     b.HasOne(
                             "Event_Parking_Reservation_System.Models.Booking",
-                            "Booking"
-                        )
+                            "Booking")
                         .WithMany("BookingSeats")
                         .HasForeignKey("BookingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne(
+                            "Event_Parking_Reservation_System.Models.Seat",
+                            "Seat")
+                        .WithMany("BookingSeats")
+                        .HasForeignKey("SeatId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Booking");
+
+                    b.Navigation("Seat");
                 });
 
+            // EVENT RELATIONSHIPS
+            modelBuilder.Entity(
+                "Event_Parking_Reservation_System.Models.Event",
+                b =>
+                {
+                    b.HasOne(
+                            "Event_Parking_Reservation_System.Models.EventCategory",
+                            "Category")
+                        .WithMany("Events")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
+                    b.HasOne(
+                            "Event_Parking_Reservation_System.Models.Venue",
+                            "Venue")
+                        .WithMany("Events")
+                        .HasForeignKey("VenueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Venue");
+                });
+
+            // PAYMENT RELATIONSHIP
             modelBuilder.Entity(
                 "Event_Parking_Reservation_System.Models.Payment",
                 b =>
                 {
                     b.HasOne(
                             "Event_Parking_Reservation_System.Models.Booking",
-                            "Booking"
-                        )
+                            "Booking")
                         .WithMany()
                         .HasForeignKey("BookingId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -308,15 +452,30 @@ namespace Event_Parking_Reservation_System.Migrations
                     b.Navigation("Booking");
                 });
 
+            // SEAT RELATIONSHIP
+            modelBuilder.Entity(
+                "Event_Parking_Reservation_System.Models.Seat",
+                b =>
+                {
+                    b.HasOne(
+                            "Event_Parking_Reservation_System.Models.Event",
+                            "Event")
+                        .WithMany("Seats")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
+                    b.Navigation("Event");
+                });
+
+            // USER - ROLE RELATIONSHIP
             modelBuilder.Entity(
                 "Event_Parking_Reservation_System.Models.User",
                 b =>
                 {
                     b.HasOne(
                             "Event_Parking_Reservation_System.Models.Role",
-                            "Role"
-                        )
+                            "Role")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -325,12 +484,40 @@ namespace Event_Parking_Reservation_System.Migrations
                     b.Navigation("Role");
                 });
 
-
+            // NAVIGATIONS
             modelBuilder.Entity(
                 "Event_Parking_Reservation_System.Models.Booking",
                 b =>
                 {
                     b.Navigation("BookingSeats");
+                });
+
+            modelBuilder.Entity(
+                "Event_Parking_Reservation_System.Models.Event",
+                b =>
+                {
+                    b.Navigation("Seats");
+                });
+
+            modelBuilder.Entity(
+                "Event_Parking_Reservation_System.Models.EventCategory",
+                b =>
+                {
+                    b.Navigation("Events");
+                });
+
+            modelBuilder.Entity(
+                "Event_Parking_Reservation_System.Models.Seat",
+                b =>
+                {
+                    b.Navigation("BookingSeats");
+                });
+
+            modelBuilder.Entity(
+                "Event_Parking_Reservation_System.Models.Venue",
+                b =>
+                {
+                    b.Navigation("Events");
                 });
 
 #pragma warning restore 612, 618

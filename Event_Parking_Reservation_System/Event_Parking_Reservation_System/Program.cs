@@ -16,21 +16,36 @@ namespace Event_Parking_Reservation_System
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Database
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection")
                 )
             );
 
+            // Authentication
             builder.Services.AddScoped<IAuthService, AuthService>();
+
+            // Booking
             builder.Services.AddScoped<IBookingService, BookingService>();
             builder.Services.AddHostedService<BookingExpirationService>();
+
+            // Payment
             builder.Services.AddScoped<IPaymentService, PaymentService>();
+
+            // Private Event Booking
             builder.Services.AddScoped<
                 IPrivateEventBookingService,
                 PrivateEventBookingService
             >();
 
+            // Event Management
+            builder.Services.AddScoped<IVenueService, VenueService>();
+            builder.Services.AddScoped<IEventCategoryService, EventCategoryService>();
+            builder.Services.AddScoped<IEventService, EventService>();
+            builder.Services.AddScoped<ISeatService, SeatService>();
+
+            // JWT Authentication
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme =
@@ -64,6 +79,7 @@ namespace Event_Parking_Reservation_System
                     };
             });
 
+            // Angular CORS
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy(
@@ -79,7 +95,9 @@ namespace Event_Parking_Reservation_System
             });
 
             builder.Services.AddControllers();
+
             builder.Services.AddEndpointsApiExplorer();
+
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
@@ -87,6 +105,7 @@ namespace Event_Parking_Reservation_System
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
+
                 app.UseSwaggerUI();
             }
 

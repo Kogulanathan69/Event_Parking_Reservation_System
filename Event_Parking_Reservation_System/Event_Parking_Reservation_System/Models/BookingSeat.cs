@@ -13,6 +13,8 @@
 
         public Booking? Booking { get; set; }
 
-        
+        public Seat? Seat { get; set; }
+
+
     }
 }
