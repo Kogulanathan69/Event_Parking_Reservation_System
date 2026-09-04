@@ -23,5 +23,8 @@ namespace Event_Parking_Reservation_System.Models
         public Venue? Venue { get; set; }
 
         public EventCategory? Category { get; set; }
+
+        public ICollection<Seat> Seats { get; set; }
+    = new List<Seat>();
     }
 }
