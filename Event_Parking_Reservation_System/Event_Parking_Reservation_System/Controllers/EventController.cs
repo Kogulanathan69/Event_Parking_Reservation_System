@@ -15,6 +15,7 @@ namespace Event_Parking_Reservation_System.Controllers
             _eventService = eventService;
         }
 
+       
         [HttpGet]
         public async Task<IActionResult> GetAllEvents()
         {
@@ -23,6 +24,7 @@ namespace Event_Parking_Reservation_System.Controllers
             return Ok(events);
         }
 
+        
         [HttpGet("{id}")]
         public async Task<IActionResult> GetEventById(int id)
         {
@@ -36,6 +38,7 @@ namespace Event_Parking_Reservation_System.Controllers
             return Ok(eventDto);
         }
 
+      
         [HttpPost]
         public async Task<IActionResult> CreateEvent(
             [FromBody] CreateEventDto dto)
@@ -68,6 +71,7 @@ namespace Event_Parking_Reservation_System.Controllers
             }
         }
 
+        
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateEvent(
             int id,
@@ -105,6 +109,7 @@ namespace Event_Parking_Reservation_System.Controllers
             }
         }
 
+        
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEvent(int id)
         {
@@ -126,6 +131,37 @@ namespace Event_Parking_Reservation_System.Controllers
             catch (InvalidOperationException ex)
             {
                 return Conflict(new
+                {
+                    message = ex.Message
+                });
+            }
+        }
+
+        
+        [HttpPut("{id}/publish")]
+        public async Task<IActionResult> PublishEvent(int id)
+        {
+            try
+            {
+                var result = await _eventService
+                    .PublishEventAsync(id);
+
+                if (!result)
+                {
+                    return NotFound(new
+                    {
+                        message = "Event not found"
+                    });
+                }
+
+                return Ok(new
+                {
+                    message = "Event published successfully"
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new
                 {
                     message = ex.Message
                 });

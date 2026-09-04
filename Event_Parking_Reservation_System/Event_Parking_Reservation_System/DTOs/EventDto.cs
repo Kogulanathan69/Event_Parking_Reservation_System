@@ -23,5 +23,7 @@ namespace Event_Parking_Reservation_System.DTOs
         public decimal ParkingFee { get; set; }
 
         public int Capacity { get; set; }
+
+        public bool IsPublished { get; set; }
     }
 }

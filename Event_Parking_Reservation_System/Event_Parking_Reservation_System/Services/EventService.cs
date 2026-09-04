@@ -23,14 +23,19 @@ namespace Event_Parking_Reservation_System.Services
                     Id = e.Id,
                     Name = e.Name,
                     VenueId = e.VenueId,
-                    VenueName = e.Venue != null ? e.Venue.Name : string.Empty,
+                    VenueName = e.Venue != null
+                        ? e.Venue.Name
+                        : string.Empty,
                     CategoryId = e.CategoryId,
-                    CategoryName = e.Category != null ? e.Category.Name : string.Empty,
+                    CategoryName = e.Category != null
+                        ? e.Category.Name
+                        : string.Empty,
                     StartDateTime = e.StartDateTime,
                     EndDateTime = e.EndDateTime,
                     TicketPrice = e.TicketPrice,
                     ParkingFee = e.ParkingFee,
-                    Capacity = e.Capacity
+                    Capacity = e.Capacity,
+                    IsPublished = e.IsPublished
                 })
                 .ToListAsync();
         }
@@ -44,19 +49,25 @@ namespace Event_Parking_Reservation_System.Services
                     Id = e.Id,
                     Name = e.Name,
                     VenueId = e.VenueId,
-                    VenueName = e.Venue != null ? e.Venue.Name : string.Empty,
+                    VenueName = e.Venue != null
+                        ? e.Venue.Name
+                        : string.Empty,
                     CategoryId = e.CategoryId,
-                    CategoryName = e.Category != null ? e.Category.Name : string.Empty,
+                    CategoryName = e.Category != null
+                        ? e.Category.Name
+                        : string.Empty,
                     StartDateTime = e.StartDateTime,
                     EndDateTime = e.EndDateTime,
                     TicketPrice = e.TicketPrice,
                     ParkingFee = e.ParkingFee,
-                    Capacity = e.Capacity
+                    Capacity = e.Capacity,
+                    IsPublished = e.IsPublished
                 })
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<EventDto> CreateEventAsync(CreateEventDto dto)
+        public async Task<EventDto> CreateEventAsync(
+            CreateEventDto dto)
         {
             if (dto.StartDateTime >= dto.EndDateTime)
             {
@@ -65,11 +76,14 @@ namespace Event_Parking_Reservation_System.Services
                 );
             }
 
-            var venue = await _context.Venues.FindAsync(dto.VenueId);
+            var venue = await _context.Venues
+                .FindAsync(dto.VenueId);
 
             if (venue == null)
             {
-                throw new InvalidOperationException("Venue not found.");
+                throw new InvalidOperationException(
+                    "Venue not found."
+                );
             }
 
             var category = await _context.EventCategories
@@ -77,7 +91,9 @@ namespace Event_Parking_Reservation_System.Services
 
             if (category == null)
             {
-                throw new InvalidOperationException("Category not found.");
+                throw new InvalidOperationException(
+                    "Category not found."
+                );
             }
 
             if (dto.Capacity > venue.Capacity)
@@ -109,7 +125,8 @@ namespace Event_Parking_Reservation_System.Services
                 EndDateTime = dto.EndDateTime,
                 TicketPrice = dto.TicketPrice,
                 ParkingFee = dto.ParkingFee,
-                Capacity = dto.Capacity
+                Capacity = dto.Capacity,
+                IsPublished = false
             };
 
             _context.Events.Add(eventEntity);
@@ -128,7 +145,8 @@ namespace Event_Parking_Reservation_System.Services
                 EndDateTime = eventEntity.EndDateTime,
                 TicketPrice = eventEntity.TicketPrice,
                 ParkingFee = eventEntity.ParkingFee,
-                Capacity = eventEntity.Capacity
+                Capacity = eventEntity.Capacity,
+                IsPublished = eventEntity.IsPublished
             };
         }
 
@@ -136,7 +154,8 @@ namespace Event_Parking_Reservation_System.Services
             int id,
             UpdateEventDto dto)
         {
-            var eventEntity = await _context.Events.FindAsync(id);
+            var eventEntity = await _context.Events
+                .FindAsync(id);
 
             if (eventEntity == null)
             {
@@ -150,11 +169,14 @@ namespace Event_Parking_Reservation_System.Services
                 );
             }
 
-            var venue = await _context.Venues.FindAsync(dto.VenueId);
+            var venue = await _context.Venues
+                .FindAsync(dto.VenueId);
 
             if (venue == null)
             {
-                throw new InvalidOperationException("Venue not found.");
+                throw new InvalidOperationException(
+                    "Venue not found."
+                );
             }
 
             var category = await _context.EventCategories
@@ -162,7 +184,9 @@ namespace Event_Parking_Reservation_System.Services
 
             if (category == null)
             {
-                throw new InvalidOperationException("Category not found.");
+                throw new InvalidOperationException(
+                    "Category not found."
+                );
             }
 
             if (dto.Capacity > venue.Capacity)
@@ -218,7 +242,8 @@ namespace Event_Parking_Reservation_System.Services
 
         public async Task<bool> DeleteEventAsync(int id)
         {
-            var eventEntity = await _context.Events.FindAsync(id);
+            var eventEntity = await _context.Events
+                .FindAsync(id);
 
             if (eventEntity == null)
             {
@@ -241,6 +266,47 @@ namespace Event_Parking_Reservation_System.Services
             }
 
             _context.Events.Remove(eventEntity);
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> PublishEventAsync(int id)
+        {
+            var eventEntity = await _context.Events
+                .FindAsync(id);
+
+            if (eventEntity == null)
+            {
+                return false;
+            }
+
+            if (eventEntity.IsPublished)
+            {
+                throw new InvalidOperationException(
+                    "Event is already published."
+                );
+            }
+
+            var seatCount = await _context.Seats
+                .CountAsync(s => s.EventId == id);
+
+            if (seatCount == 0)
+            {
+                throw new InvalidOperationException(
+                    "Cannot publish event without seats."
+                );
+            }
+
+            if (seatCount > eventEntity.Capacity)
+            {
+                throw new InvalidOperationException(
+                    "Seat count cannot exceed event capacity."
+                );
+            }
+
+            eventEntity.IsPublished = true;
 
             await _context.SaveChangesAsync();
 

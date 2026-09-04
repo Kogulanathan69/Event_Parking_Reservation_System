@@ -13,5 +13,7 @@ namespace Event_Parking_Reservation_System.Interfaces
         Task<bool> UpdateEventAsync(int id, UpdateEventDto dto);
 
         Task<bool> DeleteEventAsync(int id);
+
+        Task<bool> PublishEventAsync(int id);
     }
 }

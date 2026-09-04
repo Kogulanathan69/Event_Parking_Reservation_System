@@ -20,6 +20,8 @@ namespace Event_Parking_Reservation_System.Models
 
         public int Capacity { get; set; }
 
+        public bool IsPublished { get; set; } = false;
+
         public Venue? Venue { get; set; }
 
         public EventCategory? Category { get; set; }
