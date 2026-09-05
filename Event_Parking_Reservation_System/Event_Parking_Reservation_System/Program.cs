@@ -24,13 +24,13 @@ namespace Event_Parking_Reservation_System
 
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
-            builder.Services.AddScoped<IBookingService, BookingService>();
-            builder.Services.AddHostedService<BookingExpirationService>();
-            builder.Services.AddScoped<IPaymentService, PaymentService>();
-            builder.Services.AddScoped<
-                IPrivateEventBookingService,
-                PrivateEventBookingService
-            >();
+            //builder.Services.AddScoped<IBookingService, BookingService>();
+            //builder.Services.AddHostedService<BookingExpirationService>();
+            //builder.Services.AddScoped<IPaymentService, PaymentService>();
+            //builder.Services.AddScoped<
+            //    IPrivateEventBookingService,
+            //    PrivateEventBookingService
+            ;
 
             builder.Services.AddAuthentication(options =>
             {
