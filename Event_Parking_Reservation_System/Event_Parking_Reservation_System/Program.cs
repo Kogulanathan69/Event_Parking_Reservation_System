@@ -30,6 +30,9 @@ namespace Event_Parking_Reservation_System
             builder.Services.AddScoped<IBookingService, BookingService>();
             builder.Services.AddHostedService<BookingExpirationService>();
 
+            // Parking
+            builder.Services.AddScoped<IParkingService, ParkingService>();
+
             // Payment
             builder.Services.AddScoped<IPaymentService, PaymentService>();
 

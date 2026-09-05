@@ -24,6 +24,10 @@ namespace Event_Parking_Reservation_System.Data
         public DbSet<Event> Events { get; set; }
         public DbSet<Seat> Seats { get; set; }
 
+        public DbSet<ParkingArea> ParkingAreas { get; set; }
+        public DbSet<ParkingSlot> ParkingSlots { get; set; }
+        public DbSet<ParkingReservation> ParkingReservations { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -39,6 +43,12 @@ namespace Event_Parking_Reservation_System.Data
             modelBuilder.Entity<Payment>()
                 .Property(p => p.Amount)
                 .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.Booking)
+                .WithMany()
+                .HasForeignKey(p => p.BookingId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<PrivateEventBooking>()
                 .Property(p => p.TotalAmount)
@@ -75,6 +85,51 @@ namespace Event_Parking_Reservation_System.Data
                     s.Row,
                     s.Number
                 })
+                .IsUnique();
+
+            // Parking Area Configurations
+            modelBuilder.Entity<ParkingArea>()
+                .HasOne(pa => pa.Venue)
+                .WithMany()
+                .HasForeignKey(pa => pa.VenueId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Parking Slot Configurations
+            modelBuilder.Entity<ParkingSlot>()
+                .HasOne(ps => ps.ParkingArea)
+                .WithMany(pa => pa.ParkingSlots)
+                .HasForeignKey(ps => ps.ParkingAreaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ParkingSlot>()
+                .HasIndex(ps => new { ps.ParkingAreaId, ps.SlotNumber })
+                .IsUnique();
+
+            // Parking Reservation Configurations
+            modelBuilder.Entity<ParkingReservation>()
+                .Property(pr => pr.ParkingFee)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<ParkingReservation>()
+                .HasOne(pr => pr.Booking)
+                .WithOne()
+                .HasForeignKey<ParkingReservation>(pr => pr.BookingId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ParkingReservation>()
+                .HasOne(pr => pr.ParkingArea)
+                .WithMany(pa => pa.ParkingReservations)
+                .HasForeignKey(pr => pr.ParkingAreaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ParkingReservation>()
+                .HasOne(pr => pr.ParkingSlot)
+                .WithMany(ps => ps.ParkingReservations)
+                .HasForeignKey(pr => pr.ParkingSlotId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ParkingReservation>()
+                .HasIndex(pr => pr.QrToken)
                 .IsUnique();
         }
     }
