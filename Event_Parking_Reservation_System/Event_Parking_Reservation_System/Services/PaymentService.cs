@@ -1,4 +1,4 @@
-﻿using Event_Parking_Reservation_System.Data;
+using Event_Parking_Reservation_System.Data;
 using Event_Parking_Reservation_System.DTOs;
 using Event_Parking_Reservation_System.Interfaces;
 using Event_Parking_Reservation_System.Models;
@@ -22,6 +22,7 @@ namespace Event_Parking_Reservation_System.Services
         public async Task<List<PaymentDto>> GetAllPaymentsAsync()
         {
             return await _context.Payments
+                .OrderByDescending(p => p.PaymentDate)
                 .Select(p => new PaymentDto
                 {
                     Id = p.Id,
@@ -52,81 +53,67 @@ namespace Event_Parking_Reservation_System.Services
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<PaymentDto> CreatePaymentAsync(
-            CreatePaymentDto dto)
+        public async Task<PaymentDto> CreatePaymentAsync(CreatePaymentDto dto)
         {
+            // 1. Booking Validation
             var booking = await _context.Bookings
                 .FirstOrDefaultAsync(b => b.Id == dto.BookingId);
 
             if (booking == null)
             {
-                throw new InvalidOperationException(
-                    "Booking not found"
-                );
+                throw new InvalidOperationException("Booking not found.");
             }
 
-            if (booking.Status != "Pending")
+            if (booking.Status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase))
             {
-                throw new InvalidOperationException(
-                    $"Payment cannot be made for booking with status {booking.Status}"
-                );
+                throw new InvalidOperationException("Payment cannot be processed for a cancelled booking.");
             }
 
-            if (booking.ExpiresAt <= DateTime.UtcNow)
+            if (booking.Status.Equals("Expired", StringComparison.OrdinalIgnoreCase) || booking.ExpiresAt <= DateTime.UtcNow)
             {
                 booking.Status = "Expired";
-
                 await _context.SaveChangesAsync();
-
-                throw new InvalidOperationException(
-                    "Booking has expired"
-                );
+                throw new InvalidOperationException("Booking has expired.");
             }
 
-            if (dto.Amount != booking.TotalAmount)
+            if (!booking.Status.Equals("Pending", StringComparison.OrdinalIgnoreCase))
             {
-                throw new InvalidOperationException(
-                    "Payment amount does not match booking total"
-                );
+                throw new InvalidOperationException($"Payment cannot be processed for booking with status '{booking.Status}'.");
             }
 
-            var existingPayment = await _context.Payments
-                .AnyAsync(p =>
-                    p.BookingId == dto.BookingId &&
-                    p.Status == "Success");
+            // 2. Validate Payment Method (Only Card, Cash, BankTransfer allowed)
+            var validMethods = new[] { "Card", "Cash", "BankTransfer" };
+            var matchedMethod = validMethods.FirstOrDefault(m => m.Equals(dto.PaymentMethod?.Trim(), StringComparison.OrdinalIgnoreCase));
 
-            if (existingPayment)
+            if (matchedMethod == null)
             {
-                throw new InvalidOperationException(
-                    "Booking has already been paid"
-                );
+                throw new InvalidOperationException("Invalid payment method. Allowed methods are: Card, Cash, BankTransfer.");
             }
 
+            // 3. Prevent duplicate successful payments
+            var alreadyPaid = await HasSuccessfulPaymentAsync(dto.BookingId);
+            if (alreadyPaid)
+            {
+                throw new InvalidOperationException("Booking has already been paid successfully.");
+            }
+
+            // 4. Create Simulated Payment (Backend trusted amount from Booking.TotalAmount)
             var payment = new Payment
             {
                 BookingId = dto.BookingId,
-                Amount = dto.Amount,
-                PaymentMethod = dto.PaymentMethod,
+                Amount = booking.TotalAmount,
+                PaymentMethod = matchedMethod,
                 Status = "Success",
                 PaymentDate = DateTime.UtcNow,
-
-                TransactionReference =
-                    $"PAY-{Guid.NewGuid().ToString()[..8].ToUpper()}"
+                TransactionReference = $"PAY-{Guid.NewGuid().ToString()[..8].ToUpper()}"
             };
 
             _context.Payments.Add(payment);
 
+            // 5. Confirm Booking
+            booking.Status = "Confirmed";
+
             await _context.SaveChangesAsync();
-
-            var confirmed = await _bookingService
-                .ConfirmBookingAsync(dto.BookingId);
-
-            if (!confirmed)
-            {
-                throw new InvalidOperationException(
-                    "Unable to confirm booking"
-                );
-            }
 
             return new PaymentDto
             {
@@ -142,8 +129,10 @@ namespace Event_Parking_Reservation_System.Services
 
         public async Task<PaymentDto?> GetPaymentByBookingIdAsync(int bookingId)
         {
-            return await _context.Payments
-                .Where(p => p.BookingId == bookingId)
+            // Preference 1: Successful payment if available
+            var successfulPayment = await _context.Payments
+                .Where(p => p.BookingId == bookingId && p.Status == "Success")
+                .OrderByDescending(p => p.PaymentDate)
                 .Select(p => new PaymentDto
                 {
                     Id = p.Id,
@@ -155,6 +144,51 @@ namespace Event_Parking_Reservation_System.Services
                     TransactionReference = p.TransactionReference
                 })
                 .FirstOrDefaultAsync();
+
+            if (successfulPayment != null)
+            {
+                return successfulPayment;
+            }
+
+            // Preference 2: Otherwise latest payment attempt
+            return await _context.Payments
+                .Where(p => p.BookingId == bookingId)
+                .OrderByDescending(p => p.PaymentDate)
+                .Select(p => new PaymentDto
+                {
+                    Id = p.Id,
+                    BookingId = p.BookingId,
+                    Amount = p.Amount,
+                    PaymentMethod = p.PaymentMethod,
+                    Status = p.Status,
+                    PaymentDate = p.PaymentDate,
+                    TransactionReference = p.TransactionReference
+                })
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<PaymentDto>> GetPaymentsByBookingIdAsync(int bookingId)
+        {
+            return await _context.Payments
+                .Where(p => p.BookingId == bookingId)
+                .OrderByDescending(p => p.PaymentDate)
+                .Select(p => new PaymentDto
+                {
+                    Id = p.Id,
+                    BookingId = p.BookingId,
+                    Amount = p.Amount,
+                    PaymentMethod = p.PaymentMethod,
+                    Status = p.Status,
+                    PaymentDate = p.PaymentDate,
+                    TransactionReference = p.TransactionReference
+                })
+                .ToListAsync();
+        }
+
+        public async Task<bool> HasSuccessfulPaymentAsync(int bookingId)
+        {
+            return await _context.Payments
+                .AnyAsync(p => p.BookingId == bookingId && p.Status == "Success");
         }
     }
 }

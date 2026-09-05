@@ -15,7 +15,7 @@ namespace Event_Parking_Reservation_System.Interfaces
         Task<bool> DeleteVenueAsync(int id);
 
         Task<bool> IsVenueAvailableAsync(
-            int venueId,
+          int venueId,
             DateTime startDateTime,
             DateTime endDateTime
         );
